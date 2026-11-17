@@ -1,0 +1,56 @@
+{
+  "name": "@wayco/shared",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./database": {
+      "types": "./dist/database/types.d.ts",
+      "import": "./dist/database/types.js"
+    },
+    "./vehicles": {
+      "types": "./dist/vehicles/index.d.ts",
+      "import": "./dist/vehicles/index.js"
+    },
+    "./pricing-engine": {
+      "types": "./dist/pricing_engine/index.d.ts",
+      "import": "./dist/pricing_engine/index.js"
+    },
+    "./users": {
+      "types": "./dist/users/index.d.ts",
+      "import": "./dist/users/index.js"
+    },
+    "./trips": {
+      "types": "./dist/trips/index.d.ts",
+      "import": "./dist/trips/index.js"
+    },
+    "./reservations": {
+      "types": "./dist/reservations/index.d.ts",
+      "import": "./dist/reservations/index.js"
+    },
+    "./admin": {
+      "types": "./dist/admin/index.d.ts",
+      "import": "./dist/admin/index.js"
+    }
+  },
+  "scripts": {
+    "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
+    "typecheck": "tsc --noEmit",
+    "build": "npm run clean && tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

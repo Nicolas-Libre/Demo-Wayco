@@ -1,0 +1,12 @@
+ETAPA 2 - DEMO AISLADA DE WAYCO
+
+Esta entrega es una demo funcional INDEPENDIENTE que reutiliza el almacenamiento de la etapa 1, pero NO reproduce todavía las pantallas originales de Wayco. No sustituye la integración final.
+
+Copiar demoGitHub/ sobre la carpeta demoGitHub/ de la RAIZ del repositorio. Copiar .github/workflows/demo-pages.yml a la misma ruta en el repositorio. No sobrescribir apps/frontend.
+
+Probar: cd demoGitHub && npm install && npm run dev
+Publicar: subir los cambios a main (o adaptar branches en el workflow); en GitHub Settings > Pages > Source elegir GitHub Actions.
+
+El sitio no contiene cliente Supabase, ni código de API, ni credenciales; solo usa localStorage.
+
+Siguiente etapa: adaptar los formularios y vistas originales del frontend y verificar todas las rutas antes de considerarlo una réplica de Wayco.

@@ -1,0 +1,46 @@
+name: Publicar demo Wayco en GitHub Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: demoGitHub/package-lock.json
+      - name: Instalar dependencias
+        working-directory: demoGitHub
+        run: npm ci
+      - name: Compilar demo
+        working-directory: demoGitHub
+        env:
+          VITE_DEMO_MODE: 'true'
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: npm run build
+      - name: Soporte de recarga de rutas (SPA)
+        run: cp demoGitHub/dist/index.html demoGitHub/dist/404.html
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: demoGitHub/dist
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

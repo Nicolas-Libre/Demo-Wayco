@@ -1,0 +1,4 @@
+import { DemoIllustratedMap } from "./DemoIllustratedMap";
+function decodePolyline(encoded:string) { const points:{lat:number;lng:number}[]=[]; let i=0,lat=0,lng=0; while(i<encoded.length){ const values:number[]=[]; for(let j=0;j<2;j++){let shift=0,result=0,b=0;do{if(i>=encoded.length)return points;b=encoded.charCodeAt(i++)-63;result|=(b&31)<<shift;shift+=5;}while(b>=32);values.push(result&1?~(result>>1):result>>1);}lat+=values[0];lng+=values[1];points.push({lat:lat/1e5,lng:lng/1e5});}return points; }
+type Props={polyline:string|null};
+export function TripRouteMap({polyline}:Props){let points:{lat:number;lng:number}[]=[];try{points=polyline?decodePolyline(polyline):[];}catch{points=[];}return <div className="overflow-hidden rounded-[16px] border border-[#E2E0D8]"><DemoIllustratedMap className="h-[280px] w-full" origin={points[0]} destination={points.length>1?points[points.length-1]:undefined}/></div>;}
