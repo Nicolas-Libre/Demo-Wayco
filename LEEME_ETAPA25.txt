@@ -1,0 +1,13 @@
+ETAPA 25 - Catálogo local para la demo recuperada de GitHub.
+
+Reemplazar los archivos respetando rutas desde la raíz del repositorio.
+Se conservan el diseño de buscar.tsx y las tarjetas de resultados.
+Se crea local_demo_addresses.ts.
+La búsqueda compara las coordenadas seleccionadas con el catálogo y las direcciones completas de los viajes.
+Los cuatro viajes ficticios tienen direcciones completas y se migran por ID si existían con localidades.
+La publicación utiliza el mismo selector de direcciones del catálogo.
+No se carga Google Places.
+
+IMPORTANTE: Si al abrir el buscador tenés una búsqueda anterior guardada en sessionStorage, seleccioná de nuevo las direcciones.
+Prueba: Usuario Demo, Plaza Moreno (La Plata) -> Obelisco (CABA), fecha mañana.
+Comandos: cd demoGitHub; npm run build; npm run dev.

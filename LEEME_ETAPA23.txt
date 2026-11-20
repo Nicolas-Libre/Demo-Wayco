@@ -1,0 +1,35 @@
+WAYCO — ETAPA 23: VIAJES DEMO QUE COINCIDEN CON DIRECCIONES DEL CATALOGO
+
+Esta actualización se aplica sobre la demo ya instalada (etapas anteriores).
+Conserva el diseño de las pantallas de la implementación Wayco-main (2)(1).zip.
+
+ARCHIVOS QUE REEMPLAZA:
+ demoGitHub/src/demo/storage/demo_storage.ts
+ demoGitHub/src/demo/services/demo_api.ts
+
+PRUEBAS (seleccionar ambas direcciones desde el buscador y la fecha exacta):
+ - Plaza Moreno, La Plata -> Obelisco, CABA: MAÑANA, 21:00.
+ - Estación de Trenes, La Plata -> Estación Constitución, CABA: MAÑANA, 09:00.
+ - Estación Retiro, CABA -> Plaza San Martín, La Plata: PASADO MAÑANA, 18:30.
+ - Plaza Moreno, La Plata -> Plaza 17 de Octubre, Berisso: PASADO MAÑANA, 14:00.
+
+Los cuatro viajes son ejemplos; no se cargan viajes para todas las direcciones.
+Se muestran únicamente viajes futuros con asientos, de otro conductor y de la fecha buscada.
+Se corrigen las ubicaciones de las muestras existentes guardadas en localStorage.
+Las publicaciones y reservas de los usuarios se conservan.
+Los viajes de muestra se renuevan cuando vencen; los viajes publicados por usuarios
+siguen sujetos a la retención de 48 horas después de su finalización.
+
+INSTALACION: extraer el ZIP en la raiz de Demo Wayco, reemplazar archivos.
+PowerShell (terminal integrada de VS Code):
+ cd "C:\Users\Nicolas\Desktop\Wayco\Demo Wayco\demoGitHub"
+ npm run build
+ npm run dev
+
+Para publicar:
+ cd "C:\Users\Nicolas\Desktop\Wayco\Demo Wayco"
+ git add demoGitHub/src/demo/storage/demo_storage.ts demoGitHub/src/demo/services/demo_api.ts
+ git commit -m "Sincronizar viajes demo con busqueda por direcciones"
+ git push origin main
+
+No se agregan llamadas a Google Maps ni a APIs facturables.
