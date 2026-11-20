@@ -71,10 +71,10 @@ const initialTrips = (): DemoTrip[] => {
   afterTomorrow.setDate(afterTomorrow.getDate() + 2);
   const dateAt = (date: Date, time: string) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}T${time}:00`;
   return [
-    { id: "demo-trip-today-laplata-caba", origin: "La Plata", destination: "CABA", departureAt: dateAt(new Date(), "21:00"), seatsTotal: 3, seatsAvailable: 3 },
-    { id: "demo-trip-laplata-caba", origin: "La Plata", destination: "Buenos Aires", departureAt: dateAt(tomorrow, "09:00"), seatsTotal: 3, seatsAvailable: 3 },
-    { id: "demo-trip-caba-laplata", origin: "Buenos Aires", destination: "La Plata", departureAt: dateAt(tomorrow, "18:30"), seatsTotal: 2, seatsAvailable: 2 },
-    { id: "demo-trip-laplata-berisso", origin: "La Plata", destination: "Berisso", departureAt: dateAt(afterTomorrow, "14:00"), seatsTotal: 4, seatsAvailable: 4 },
+    { id: "demo-trip-today-laplata-caba", origin: "Plaza Moreno, La Plata", destination: "Obelisco, CABA", departureAt: dateAt(tomorrow, "21:00"), seatsTotal: 3, seatsAvailable: 3 },
+    { id: "demo-trip-laplata-caba", origin: "Estación de Trenes, La Plata", destination: "Estación Constitución, CABA", departureAt: dateAt(tomorrow, "09:00"), seatsTotal: 3, seatsAvailable: 3 },
+    { id: "demo-trip-caba-laplata", origin: "Estación Retiro, CABA", destination: "Plaza San Martín, La Plata", departureAt: dateAt(tomorrow, "18:30"), seatsTotal: 2, seatsAvailable: 2 },
+    { id: "demo-trip-laplata-berisso", origin: "Plaza Moreno, La Plata", destination: "Estación Berazategui, Berazategui", departureAt: dateAt(afterTomorrow, "14:00"), seatsTotal: 4, seatsAvailable: 4 },
   ];
 };
 const emptyState = (): DemoState => ({ version: 1, trips: initialTrips(), reservations: [] });
@@ -101,6 +101,43 @@ export function loadDemoState(): DemoState {
     }
     const existing = parsed as DemoState;
     let migrated = purgeExpired(existing);
+    // Migración no destructiva: únicamente los cuatro viajes ficticios originales.
+    // Nunca se modifican los viajes publicados por usuarios ni sus reservas.
+    const sampleRoutes: Record<string, [string, string]> = {
+      "demo-trip-today-laplata-caba": ["Plaza Moreno, La Plata", "Obelisco, CABA"],
+      "demo-trip-laplata-caba": ["Estación de Trenes, La Plata", "Estación Constitución, CABA"],
+      "demo-trip-caba-laplata": ["Estación Retiro, CABA", "Plaza San Martín, La Plata"],
+      "demo-trip-laplata-berisso": ["Plaza Moreno, La Plata", "Estación Berazategui, Berazategui"],
+    };
+    const legacyLocalities = new Set(["La Plata", "CABA", "Buenos Aires", "Berisso"]);
+    for (const trip of existing.trips) {
+      const route = sampleRoutes[trip.id];
+      if (!route) continue;
+      if (legacyLocalities.has(trip.origin)) { trip.origin = route[0]; migrated = true; }
+      if (legacyLocalities.has(trip.destination)) { trip.destination = route[1]; migrated = true; }
+    }
+    // Viajes anteriores publicados con solo localidad: asignar puntos de ejemplo
+    // del catálogo, sin borrar los viajes ni las reservas asociadas.
+    // La ubicación exacta original no puede recuperarse de esos registros.
+    const legacyAddressDefaults: Record<string, string> = {
+      "La Plata": "Plaza Moreno, La Plata",
+      "CABA": "Obelisco, CABA",
+      "Buenos Aires": "Obelisco, CABA",
+      "Hudson": "Estación Hudson, Hudson",
+      "Quilmes": "Estación Quilmes, Quilmes",
+      "Berazategui": "Estación Berazategui, Berazategui",
+      "Berisso": "Estación Berazategui, Berazategui",
+    };
+    for (const trip of existing.trips) {
+      if (legacyAddressDefaults[trip.origin]) {
+        trip.origin = legacyAddressDefaults[trip.origin];
+        migrated = true;
+      }
+      if (legacyAddressDefaults[trip.destination]) {
+        trip.destination = legacyAddressDefaults[trip.destination];
+        migrated = true;
+      }
+    }
     existing.trips.forEach((trip, index) => {
       if (!trip.driverId) {
         trip.driverId = trip.id.startsWith("demo-trip-") ? `demo-driver-${index % SAMPLE_DRIVERS.length}` : DEMO_USER_ID;

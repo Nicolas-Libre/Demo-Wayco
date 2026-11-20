@@ -1,3 +1,4 @@
+import { findDemoAddress, findDemoAddressByCoordinates, normalizeDemoAddress } from "@/features/maps/config/local_demo_addresses";
 /** Codifica una línea ilustrativa de dos puntos en formato Google encoded polyline, sin conectarse a Google. */
 function encodeDemoPolyline(points: {lat:number; lng:number}[]): string {
   let lastLat = 0, lastLng = 0, result = "";
@@ -27,7 +28,7 @@ const getUser = () => {
 };
 const driver = { name: "Usuario Demo", averageRating: 4.9, totalTrips: 12 };
 type Trip = ReturnType<typeof loadDemoState>["trips"][number];
-const present = (t: Trip) => ({ id: t.id, origin: t.origin, destination: t.destination, originAddress: t.origin, destinationAddress: t.destination, date: t.departureAt.slice(0, 10), departureTime: t.departureAt.slice(11, 16), pricePerSeat: t.pricePerSeat ?? 2500, availableSeats: t.seatsAvailable, totalSeats: t.seatsTotal, vehicleDescription: "Toyota Etios", driver: { ...driver, name: t.driverName ?? "Usuario Demo" } });
+const present = (t: Trip) => ({ id: t.id, origin: t.origin, destination: t.destination, originAddress: null, destinationAddress: null, date: t.departureAt.slice(0, 10), departureTime: t.departureAt.slice(11, 16), pricePerSeat: t.pricePerSeat ?? 2500, availableSeats: t.seatsAvailable, totalSeats: t.seatsTotal, vehicleDescription: "Toyota Etios", driver: { ...driver, name: t.driverName ?? "Usuario Demo" } });
 /** Coordenadas locales de referencia para los recorridos de la demo. */
 const demoCityCoordinates = [
   { names: ["la plata"], lat: -34.9214, lng: -57.9544 },
@@ -51,11 +52,11 @@ export async function demoApi(path: string, method: string, body: unknown): Prom
   if (method === "POST" && p === "/api/maps/dynamic-map/reserve") return { allowed: true, current_count: 0, max_count: 100, warning_reached: false };
   if (method === "POST" && p === "/api/maps/geocode") {
     const address = String(data.address ?? "");
-    const known = [{ key: "la plata", lat: -34.9214, lng: -57.9544 }, { key: "buenos aires", lat: -34.6037, lng: -58.3816 }, { key: "berisso", lat: -34.8735, lng: -57.8831 }, { key: "ensenada", lat: -34.8629, lng: -57.9115 }];
-    const found = known.find(x => address.toLowerCase().includes(x.key));
-    const point = found ?? { lat: -34.9214, lng: -57.9544 };
-    return { lat: point.lat, lng: point.lng, address, locality: found?.key ?? address };
+    const point = findDemoAddress(address);
+    if (!point) throw new Error("La dirección no está disponible en el catálogo de la demo.");
+    return { lat: point.lat, lng: point.lng, address: point.address, locality: point.locality };
   }
+
   if (method === "POST" && p === "/api/maps/reverse-geocode") return { lat: Number(data.lat), lng: Number(data.lng), address: "Ubicación de demostración", locality: "Demo" };
   if (method === "POST" && p === "/api/maps/route") {
     const origin = data.origin as { lat: number; lng: number };
@@ -125,9 +126,35 @@ export async function demoApi(path: string, method: string, body: unknown): Prom
   if (method === "GET" && p === "/api/users/me/capabilities") return { isAdministrative: false };
   if (method === "GET" && p === "/api/vehicles/me") return [vehicle];
   if (method === "GET" && p === "/api/trips/today") return state.trips.filter(t => t.departureAt.slice(0, 10) === new Date().toLocaleDateString("en-CA")).map(present);
-  if (method === "GET" && p === "/api/trips/search") return state.trips.filter(t => t.driverId !== activeDemoUserId() && (!url.searchParams.get("origin") || t.origin.toLowerCase().includes(url.searchParams.get("origin")!.toLowerCase())) && (!url.searchParams.get("destination") || (t.destination.toLowerCase().includes(url.searchParams.get("destination")!.toLowerCase()) || (url.searchParams.get("destination")!.toLowerCase() === "caba" && t.destination.toLowerCase().includes("buenos aires")))) && (!url.searchParams.get("date") || t.departureAt.startsWith(url.searchParams.get("date")!))).map(present);
+  if (method === "GET" && p === "/api/trips/search") {
+    const originLat = Number(url.searchParams.get("originLat"));
+    const originLng = Number(url.searchParams.get("originLng"));
+    const destinationLat = Number(url.searchParams.get("destinationLat"));
+    const destinationLng = Number(url.searchParams.get("destinationLng"));
+    const requestedOrigin = findDemoAddressByCoordinates(originLat, originLng);
+    const requestedDestination = findDemoAddressByCoordinates(destinationLat, destinationLng);
+    if (!requestedOrigin || !requestedDestination) return [];
+    const date = url.searchParams.get("date");
+    return state.trips.filter(t =>
+      t.driverId !== activeDemoUserId() &&
+      t.seatsAvailable > 0 &&
+      normalizeDemoAddress(t.origin) === normalizeDemoAddress(requestedOrigin.address) &&
+      normalizeDemoAddress(t.destination) === normalizeDemoAddress(requestedDestination.address) &&
+      (!date || t.departureAt.startsWith(date))
+    ).map(present);
+  }
   if (method === "GET" && p === "/api/trips/me") return state.trips.filter(t => t.driverId === activeDemoUserId()).map(t => ({ ...present(t), status: "activo", reservations: state.reservations.filter(r => r.tripId === t.id).map(r => ({ id: r.id, passengerId: r.passengerId ?? userId, seats: r.seats, status: r.status ?? "confirmada", passenger: { name: r.passengerName ?? "Usuario Demo" } })) }));
-  if (method === "POST" && p === "/api/trips") { const t = addDemoTrip({ origin: String(data.origin ?? ""), destination: String(data.destination ?? ""), departureAt: `${String(data.date)}T${String(data.departureTime)}:00`, seatsTotal: Number(data.totalSeats ?? 1), pricePerSeat: Number(data.selectedPricePerSeat ?? 2500) }); return { id: t.id }; }
+  if (method === "POST" && p === "/api/trips") {
+    const originPoint = data.originPoint as { address?: string } | undefined;
+    const destinationPoint = data.destinationPoint as { address?: string } | undefined;
+    const origin = originPoint?.address ? findDemoAddress(originPoint.address) : undefined;
+    const destination = destinationPoint?.address ? findDemoAddress(destinationPoint.address) : undefined;
+    if (!origin || !destination) throw new Error("Seleccioná direcciones válidas del catálogo para publicar el viaje.");
+    const t = addDemoTrip({ origin: origin.address, destination: destination.address,
+      departureAt: `${String(data.date)}T${String(data.departureTime)}:00`,
+      seatsTotal: Number(data.totalSeats ?? 1), pricePerSeat: Number(data.selectedPricePerSeat ?? 2500) });
+    return { id: t.id };
+  }
   const detail = p.match(/^\/api\/trips\/([^/]+)$/);
   if (method === "GET" && detail) { const t = state.trips.find(x => x.id === decodeURIComponent(detail[1])); if (!t) throw new Error("Viaje no encontrado"); return { ...present(t), driverId: t.driverId ?? userId, vehicleId, notes: null, status: "activo", driver: { ...driver, name: t.driverName ?? "Usuario Demo", cbuAlias: t.driverId === activeDemoUserId() ? getUser().cbuAlias : "conductor.demo", createdAt: getUser().createdAt }, route: { distanceKm: 20, durationMinutes: 35, tollCost: 0, description: "Recorrido ilustrativo", polyline: encodeDemoPolyline([demoCoordinate(t.origin, { lat: -34.9214, lng: -57.9544 }), demoCoordinate(t.destination, { lat: -34.6037, lng: -58.3816 })]) }, pricing: { adjustedConsumptionL100Km: 7, fuelCost: 0, tollCost: 0, totalWearCost: 0, totalTripCost: 0, sharedFuelAndTollCost: 0, passengerWearCost: 0, suggestedPricePerPassenger: 2500, minimumPricePerPassenger: 2000, maximumPricePerPassenger: 3000, driverSharedCost: 0 } }; }
   if (method === "PATCH" && /^\/api\/trips\/[^/]+\/cancel$/.test(p)) {

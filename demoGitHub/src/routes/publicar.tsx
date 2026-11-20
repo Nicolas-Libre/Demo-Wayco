@@ -52,8 +52,8 @@ import {
 } from "@/features/geolocation/components/GeoPermissionSheet";
 
 import {
-  LocationPickerSheet,
-} from "@/features/maps/components/LocationPickerSheet";
+  AddressPickerSheet,
+} from "@/features/maps/components/AddressPickerSheet";
 
 import {
   RoutePreviewSheet,
@@ -2391,7 +2391,7 @@ function PublicarPage() {
        * ORIGIN MAP
        * ================================================= */}
 
-      <LocationPickerSheet
+      <AddressPickerSheet
         open={
           pointPicker ===
           "origen"
@@ -2430,7 +2430,7 @@ function PublicarPage() {
        * DESTINATION MAP
        * ================================================= */}
 
-      <LocationPickerSheet
+      <AddressPickerSheet
         open={
           pointPicker ===
           "destino"
