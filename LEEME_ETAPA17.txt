@@ -1,0 +1,17 @@
+WAYCO DEMO — ETAPA 17 (adaptación a Wayco-main (2).zip)
+
+Extraer el contenido de este ZIP sobre la raíz de Demo Wayco.
+Se incluyen componentes visuales y rutas actualizados, y packages/shared del nuevo proyecto.
+No se reemplazan los mapas ilustrativos, la sesión ficticia, el cliente API ni el almacenamiento local.
+
+ATENCIÓN: la finalización y las calificaciones del nuevo frontend aún no están simuladas
+funcionalmente: se muestra estado informativo, sin calificaciones habilitadas.
+El historial de viajes finalizados permanece vacío.
+La compilación completa no pudo verificarse en este entorno (dependencias nativas de Rollup de Windows).
+
+Probar desde la raíz con PowerShell:
+  cd demoGitHub
+  npm run build
+  npm run dev
+
+No publicar hasta comprobar las pantallas, búsqueda, publicación y reservas.
