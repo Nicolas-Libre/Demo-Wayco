@@ -20,3 +20,12 @@ ReactDOM.createRoot(rootElement).render(
     <RouterProvider router={router} />
   </React.StrictMode>,
 );
+// Registrar el Service Worker únicamente en la versión publicada.
+// En desarrollo, Vite mantiene su propio servidor y no necesita caché PWA.
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    const swUrl = `${import.meta.env.BASE_URL}sw.js`;
+    navigator.serviceWorker.register(swUrl, { scope: import.meta.env.BASE_URL })
+      .catch((error) => console.warn("Wayco: no se pudo registrar el Service Worker", error));
+  });
+}
