@@ -169,3 +169,35 @@ export function deleteDesignatedDriver(
     )}`,
   );
 }
+
+/* =========================================================
+ * VEHICLE CATALOG - AUTHENTICATED ENDPOINTS
+ * ======================================================= */
+
+export type CatalogOptions = string[];
+
+export function getCatalogBrands(): Promise<CatalogOptions> {
+  return api_get<CatalogOptions>("/api/vehicles/catalog/brands");
+}
+
+export function getCatalogModels(brand: string): Promise<CatalogOptions> {
+  return api_get<CatalogOptions>(
+    `/api/vehicles/catalog/models?brand=${encodeURIComponent(brand)}`,
+  );
+}
+
+export function getCatalogYears(brand: string, model: string): Promise<number[]> {
+  return api_get<number[]>(
+    `/api/vehicles/catalog/years?brand=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}`,
+  );
+}
+
+export function getCatalogVersions(
+  brand: string,
+  model: string,
+  year: number,
+): Promise<CatalogOptions> {
+  return api_get<CatalogOptions>(
+    `/api/vehicles/catalog/versions?brand=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}&year=${year}`,
+  );
+}

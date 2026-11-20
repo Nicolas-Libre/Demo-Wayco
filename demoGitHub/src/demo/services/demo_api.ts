@@ -95,6 +95,33 @@ export async function demoApi(path: string, method: string, body: unknown): Prom
         driverSharedCost: sharedFuelAndTollCost },
     };
   }
+  // Reputación de demostración: datos ilustrativos por usuario.
+  if (method === "GET" && p === "/api/users/me/reputation") {
+    const mine = state.trips.filter(t => t.driverId === activeDemoUserId()).length;
+    const passenger = state.reservations.filter(r => r.passengerId === activeDemoUserId() && r.status === "confirmada").length;
+    return { driverRating: mine ? 4.9 : null, passengerRating: passenger ? 4.8 : null, driverTrips: mine, passengerTrips: passenger, credits: 0 };
+  }
+  // Historial y estado de finalización: no se inventan viajes finalizados.
+  if (method === "GET" && p === "/api/trips/history") return { driver: [], passenger: [] };
+  const completionMatch = p.match(/^\/api\/trips\/([^/]+)\/completion$/);
+  if (method === "GET" && completionMatch) {
+    const trip = state.trips.find(t => t.id === decodeURIComponent(completionMatch[1]));
+    if (!trip) throw new Error("Viaje no encontrado.");
+    const confirmed = state.reservations.filter(r => r.tripId === trip.id && r.status === "confirmada");
+    const departure = new Date(trip.departureAt).getTime();
+    const now = Date.now();
+    return {
+      tripId: trip.id, status: "activo", origin: trip.origin, destination: trip.destination,
+      date: trip.departureAt.slice(0, 10), departureTime: trip.departureAt.slice(11, 16),
+      departurePassed: now >= departure,
+      hasPendingReservations: state.reservations.some(r => r.tripId === trip.id && r.status === "pendiente"),
+      confirmedPassengers: confirmed.length, completedRatings: 0, requiredRatings: confirmed.length,
+      finalizedAt: null, estimatedArrivalAt: new Date(departure + 35 * 60000).toISOString(),
+      ratingDeadline: new Date(departure + 155 * 60000).toISOString(),
+      ratingPeriodStarted: false, ratingPeriodExpired: false, ratingPeriodOpen: false,
+      isDriver: trip.driverId === activeDemoUserId(), targets: [],
+    };
+  }
   if (method === "GET" && p === "/api/users/me/capabilities") return { isAdministrative: false };
   if (method === "GET" && p === "/api/vehicles/me") return [vehicle];
   if (method === "GET" && p === "/api/trips/today") return state.trips.filter(t => t.departureAt.slice(0, 10) === new Date().toLocaleDateString("en-CA")).map(present);

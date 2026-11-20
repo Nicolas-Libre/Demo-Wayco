@@ -1,57 +1,36 @@
-import type {
-  VehicleFuelType,
-} from "@wayco/shared/vehicles";
-
-
 export type VehicleFormState = {
-  id:
-    string;
+  id: string;
 
-  brand:
-    string;
+  brand: string;
 
-  model:
-    string;
+  model: string;
 
-  year:
-    number | "";
+  year: number | "";
 
-  licensePlate:
-    string;
+  version: string;
 
-  fuelType:
-    VehicleFuelType;
+  licensePlate: string;
 
-  consumptionL100Km:
-    number | "";
+  // El combustible y el consumo se obtienen desde public.catalog
+  // en el backend, no se envían desde este formulario.
 
-  insuranceDocumentPath:
-    string | null;
+  insuranceDocumentPath: string | null;
 
-  insuranceDocumentName:
-    string | null;
+  insuranceDocumentName: string | null;
 
-  driverLicenseDocumentPath:
-    string | null;
+  driverLicenseDocumentPath: string | null;
 
-  driverLicenseDocumentName:
-    string | null;
+  driverLicenseDocumentName: string | null;
 
-  dniFrontDocumentPath:
-    string | null;
+  dniFrontDocumentPath: string | null;
 
-  dniFrontDocumentName:
-    string | null;
+  dniFrontDocumentName: string | null;
 
-  dniBackDocumentPath:
-    string | null;
+  dniBackDocumentPath: string | null;
 
-  dniBackDocumentName:
-    string | null;
+  dniBackDocumentName: string | null;
 
-  registrationCardDocumentPath:
-    string | null;
+  registrationCardDocumentPath: string | null;
 
-  registrationCardDocumentName:
-    string | null;
+  registrationCardDocumentName: string | null;
 };

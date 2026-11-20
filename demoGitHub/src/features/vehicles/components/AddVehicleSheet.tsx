@@ -282,6 +282,7 @@ export function AddVehicleSheet({
                   {vehicle.brand}{" "}
                   {vehicle.model}{" "}
                   {vehicle.year}
+                  {vehicle.version ? ` · ${vehicle.version}` : ""}
                 </p>
 
                 <p className="mt-0.5 text-[12px] text-[#6B6A66]">

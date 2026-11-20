@@ -10,6 +10,7 @@ import { TripRoute } from "./TripRoute";
 import type { TripCardData } from "../types/trip-card.types";
 import {
   formatAvailableSeats,
+  formatDecimal,
   formatTripPrice,
   getDriverInitial,
 } from "../utils/trip-formatters";
@@ -59,7 +60,7 @@ export function TripCard({
             {trip.rating != null && (
               <span className="flex items-center gap-0.5 text-[13px] text-[#6B6A66]">
                 <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" />
-                {trip.rating.toFixed(1)}
+                {formatDecimal(trip.rating)}
               </span>
             )}
 

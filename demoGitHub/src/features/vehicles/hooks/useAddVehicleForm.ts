@@ -71,17 +71,13 @@ function createInitialState():
       "",
 
     year:
-      new Date()
-        .getFullYear(),
+      "",
+
+    version:
+      "",
 
     licensePlate:
       "",
-
-    fuelType:
-      "Nafta",
-
-    consumptionL100Km:
-      8,
 
     insuranceDocumentPath:
       null,
@@ -133,14 +129,11 @@ function createVehicleUpdateState(
     year:
       vehicle.year,
 
+    version:
+      vehicle.version ?? "",
+
     licensePlate:
       vehicle.licensePlate,
-
-    fuelType:
-      vehicle.fuelType,
-
-    consumptionL100Km:
-      vehicle.consumptionL100Km,
 
     insuranceDocumentPath:
       null,
@@ -364,16 +357,33 @@ export function useAddVehicleForm({
         value:
           VehicleFormState[K],
       ) => {
-        setForm(
-          (
-            current,
-          ) => ({
-            ...current,
-
-            [field]:
-              value,
-          }),
-        );
+        setForm((current) => {
+          if (field === "brand") {
+            return {
+              ...current,
+              brand: value as string,
+              model: "",
+              year: "",
+              version: "",
+            };
+          }
+          if (field === "model") {
+            return {
+              ...current,
+              model: value as string,
+              year: "",
+              version: "",
+            };
+          }
+          if (field === "year") {
+            return {
+              ...current,
+              year: value as number | "",
+              version: "",
+            };
+          }
+          return { ...current, [field]: value };
+        });
       },
       [],
     );
@@ -628,18 +638,11 @@ export function useAddVehicleForm({
           form.year <=
             currentYear &&
 
+          form.version.trim().length > 0 &&
+
           isValidLicensePlate(
             form.licensePlate,
-          ) &&
-
-          typeof form.consumptionL100Km ===
-            "number" &&
-
-          form.consumptionL100Km >=
-            3 &&
-
-          form.consumptionL100Km <=
-            25
+          )
         );
       },
       [
@@ -969,8 +972,8 @@ export function useAddVehicleForm({
       if (
         typeof form.year !==
           "number" ||
-        typeof form.consumptionL100Km !==
-          "number"
+        !form.version.trim() ||
+        !dataStepValid
       ) {
         throw new Error(
           "Los datos del vehículo están incompletos.",
@@ -997,11 +1000,8 @@ export function useAddVehicleForm({
               form.licensePlate,
             ),
 
-          fuelType:
-            form.fuelType,
-
-          consumptionL100Km:
-            form.consumptionL100Km,
+          version:
+            form.version.trim(),
 
           insuranceDocumentPath:
             form.insuranceDocumentPath,

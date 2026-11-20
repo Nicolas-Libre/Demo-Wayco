@@ -14,6 +14,13 @@ export function searchTrips(
     new URLSearchParams({
       origin: params.origin,
       destination: params.destination,
+
+      originLat: String(params.originLat),
+      originLng: String(params.originLng),
+
+      destinationLat: String(params.destinationLat),
+      destinationLng: String(params.destinationLng),
+
       date: params.date,
     });
 

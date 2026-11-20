@@ -10,8 +10,9 @@ import {
 export type TripRatingTarget = {
   id: string;
   name: string;
-  category: string;
+  category: "comportamiento" | "servicio_conduccion";
   score: number | null;
+  isAutomatic: boolean;
 };
 
 export type TripCompletion = {
@@ -31,6 +32,25 @@ export type TripCompletion = {
 
   completedRatings: number;
   requiredRatings: number;
+
+  finalizedAt: string | null;
+
+  // Momento estimado de llegada del viaje.
+  estimatedArrivalAt: string | null;
+
+  // Dos horas después de la llegada estimada.
+  ratingDeadline: string | null;
+
+  // Indica si ya comenzó el período de calificación.
+  ratingPeriodStarted: boolean;
+
+  // Indica si venció el período de calificación.
+  ratingPeriodExpired: boolean;
+
+  // Indica si todavía se pueden registrar calificaciones.
+  ratingPeriodOpen: boolean;
+
+  isDriver: boolean;
 
   targets: TripRatingTarget[];
 };
@@ -68,6 +88,10 @@ export type TripHistory = {
  * API
  * ======================================================= */
 
+/**
+ * Consulta el estado del viaje, sus participantes
+ * y el período disponible para calificar.
+ */
 export function get_trip_completion(
   trip_id: string,
 ): Promise<TripCompletion> {
@@ -76,6 +100,13 @@ export function get_trip_completion(
   );
 }
 
+/**
+ * Registra una calificación manual.
+ *
+ * La finalización automática del viaje se realizará
+ * desde Supabase cuando todos los participantes
+ * hayan calificado o cuando venza el plazo.
+ */
 export function rate_trip_participant(
   trip_id: string,
   input: TripRatingInput,
@@ -89,18 +120,10 @@ export function rate_trip_participant(
   );
 }
 
-export function finalize_empty_trip(
-  trip_id: string,
-): Promise<TripCompletionResult> {
-  return api_post<
-    TripCompletionResult,
-    Record<string, never>
-  >(
-    `/api/trips/${encodeURIComponent(trip_id)}/finalize`,
-    {},
-  );
-}
-
+/**
+ * Obtiene los viajes finalizados del usuario,
+ * tanto como conductor como pasajero.
+ */
 export function get_trip_history(): Promise<TripHistory> {
   return api_get<TripHistory>(
     "/api/trips/history",

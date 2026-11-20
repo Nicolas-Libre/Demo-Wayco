@@ -54,29 +54,21 @@ export function VehicleReviewStep({
         <Separator />
 
         <ReviewRow
+          label="Versión"
+          value={form.version}
+        />
+
+        <Separator />
+
+        <ReviewRow
           label="Dominio"
-          value={
-            normalizeLicensePlate(
-              form.licensePlate,
-            )
-          }
+          value={normalizeLicensePlate(form.licensePlate)}
         />
 
-        <Separator />
-
-        <ReviewRow
-          label="Combustible"
-          value={
-            form.fuelType
-          }
-        />
-
-        <Separator />
-
-        <ReviewRow
-          label="Consumo"
-          value={`${form.consumptionL100Km} L/100km`}
-        />
+        <p className="mt-3 text-[11px] leading-relaxed text-[#6B6A66]">
+          El combustible y el consumo se obtienen automáticamente del catálogo
+          de vehículos al registrar la solicitud.
+        </p>
       </div>
 
 

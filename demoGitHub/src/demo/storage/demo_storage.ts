@@ -29,6 +29,31 @@ export type DemoState = {
 };
 
 const STORAGE_KEY = "wayco_demo_v1";
+// Los datos de viajes se conservan durante 48 horas después de su finalización.
+// En la demo, la llegada estimada es 35 minutos después de la salida,
+// y el viaje finaliza 2 horas después de esa llegada.
+const ESTIMATED_TRAVEL_MS = 35 * 60 * 1000;
+const AFTER_ARRIVAL_MS = 2 * 60 * 60 * 1000;
+const RETENTION_MS = 48 * 60 * 60 * 1000;
+
+function tripExpiryTime(trip: DemoTrip): number {
+  const departure = new Date(trip.departureAt).getTime();
+  return departure + ESTIMATED_TRAVEL_MS + AFTER_ARRIVAL_MS + RETENTION_MS;
+}
+
+function purgeExpired(state: DemoState): boolean {
+  const now = Date.now();
+  const before = state.trips.length;
+  state.trips = state.trips.filter(trip => {
+    const expiry = tripExpiryTime(trip);
+    // No eliminar datos cuya fecha sea inválida: evitar pérdida accidental.
+    return !Number.isFinite(expiry) || expiry > now;
+  });
+  const retainedTripIds = new Set(state.trips.map(t => t.id));
+  const beforeReservations = state.reservations.length;
+  state.reservations = state.reservations.filter(r => retainedTripIds.has(r.tripId));
+  return state.trips.length !== before || state.reservations.length !== beforeReservations;
+}
 export const DEMO_USER_ID = "11111111-1111-4111-8111-111111111111";
 export const MARTINA_USER_ID = "demo-driver-0";
 const ACTIVE_USER_KEY = "wayco_demo_active_user_v1";
@@ -58,6 +83,7 @@ export function loadDemoState(): DemoState {
   const raw = window.localStorage.getItem(STORAGE_KEY);
   if (!raw) {
     const initial = emptyState();
+    purgeExpired(initial);
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
     return initial;
   }
@@ -74,7 +100,7 @@ export function loadDemoState(): DemoState {
       return initial;
     }
     const existing = parsed as DemoState;
-    let migrated = false;
+    let migrated = purgeExpired(existing);
     existing.trips.forEach((trip, index) => {
       if (!trip.driverId) {
         trip.driverId = trip.id.startsWith("demo-trip-") ? `demo-driver-${index % SAMPLE_DRIVERS.length}` : DEMO_USER_ID;
@@ -95,24 +121,18 @@ export function loadDemoState(): DemoState {
       existing.reservations.splice(existing.reservations.indexOf(reservation), 1);
       migrated = true;
     }
-    if (!existing.trips.some(t => t.id === "demo-trip-today-laplata-caba")) {
-      const today = initialTrips()[0];
-      today.driverId = "demo-driver-new";
-      today.driverName = "Martina López";
-      today.pricePerSeat = 2500;
-      existing.trips.unshift(today);
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
-    }
     if (migrated) window.localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
     return existing;
   } catch {
     const initial = emptyState();
+    purgeExpired(initial);
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
     return initial;
   }
 }
 
 export function saveDemoState(state: DemoState): void {
+  purgeExpired(state);
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   window.dispatchEvent(new Event("wayco-demo-changed"));
 }

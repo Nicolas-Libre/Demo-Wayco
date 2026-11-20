@@ -100,6 +100,10 @@ import {
   formatARS,
 } from "@/lib/formatters/currency";
 
+import {
+  formatDecimal,
+} from "@/features/trips/utils/trip-formatters";
+
 
 
 
@@ -1357,7 +1361,7 @@ function PublicarPage() {
         </p>
 
         <p className="mt-1 text-[12px] text-[#111110]">
-          {(tripRoute.distanceMeters / 1000).toFixed(1)} km ·{" "}
+          {formatDecimal(tripRoute.distanceMeters / 1000)} km ·{" "}
           {Math.ceil(tripRoute.durationSeconds / 60)} min
         </p>
       </div>
@@ -1748,7 +1752,7 @@ function PublicarPage() {
 
                 <div className="mt-2 space-y-1 text-[13px] text-[#111110]">
                   <Row
-                    label={`Combustible (${pricePreview.route.distanceKm}km)`}
+                    label={`Combustible (${formatDecimal(pricePreview.route.distanceKm)} km)`}
                     value={
                       formatARS(
                         pricePreview
@@ -2649,9 +2653,7 @@ function PublicarPage() {
                         vehicle.fuelType
                       }{" "}
                       ·{" "}
-                      {
-                        vehicle.consumptionL100Km
-                      }
+                      {formatDecimal(vehicle.consumptionL100Km)}
                       L/100km{" "}
                       {
                         vehicle.licensePlate

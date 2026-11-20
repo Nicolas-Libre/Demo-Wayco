@@ -15,24 +15,21 @@ import {
   VehicleValidationBadge,
 } from "@/features/vehicles/components/VehicleValidationBadge";
 
+import {
+  formatDecimal,
+} from "@/features/trips/utils/trip-formatters";
 
 type AdminVehicleDetailsProps = {
-  vehicle:
-    AdminVehicle;
+  vehicle: AdminVehicle;
 
-  approving?:
-    boolean;
+  approving?: boolean;
 
-  onApprove:
-    () => void;
+  onApprove: () => void;
 
-  onReject:
-    () => void;
+  onReject: () => void;
 
-  onDisable:
-    () => void;
+  onDisable: () => void;
 };
-
 
 export function AdminVehicleDetails({
   vehicle,
@@ -49,16 +46,12 @@ export function AdminVehicleDetails({
     vehicle.validationState ===
     "aprobado";
 
-
   const [
     reviewedDocuments,
     setReviewedDocuments,
-  ] =
-    useState<Set<string>>(
-      () =>
-        new Set(),
-    );
-
+  ] = useState<Set<string>>(
+    () => new Set(),
+  );
 
   const requiredDocumentIds =
     useMemo(
@@ -71,7 +64,6 @@ export function AdminVehicleDetails({
           "registration-card",
         ];
 
-
         for (
           const designatedDriver
           of vehicle.designatedDrivers
@@ -83,7 +75,6 @@ export function AdminVehicleDetails({
           );
         }
 
-
         return documentIds;
       },
       [
@@ -91,17 +82,13 @@ export function AdminVehicleDetails({
       ],
     );
 
-
   const documentsReviewed =
     requiredDocumentIds.every(
-      (
-        documentId,
-      ) =>
+      (documentId) =>
         reviewedDocuments.has(
           documentId,
         ),
     );
-
 
   const requiredDocumentsAvailable =
     Boolean(
@@ -111,9 +98,7 @@ export function AdminVehicleDetails({
       vehicle.driver?.dniFrontUrl &&
       vehicle.driver?.dniBackUrl &&
       vehicle.designatedDrivers.every(
-        (
-          designatedDriver,
-        ) =>
+        (designatedDriver) =>
           Boolean(
             designatedDriver.dniFrontUrl &&
             designatedDriver.dniBackUrl &&
@@ -122,25 +107,19 @@ export function AdminVehicleDetails({
       ),
     );
 
-
   const decisionDisabled =
     approving ||
     !documentsReviewed ||
     !requiredDocumentsAvailable;
 
-
   function markDocumentAsReviewed(
-    documentId:
-      string,
+    documentId: string,
   ) {
     setReviewedDocuments(
-      (
-        current,
-      ) => {
-        const next =
-          new Set(
-            current,
-          );
+      (current) => {
+        const next = new Set(
+          current,
+        );
 
         next.add(
           documentId,
@@ -150,7 +129,6 @@ export function AdminVehicleDetails({
       },
     );
   }
-
 
   return (
     <div className="space-y-4">
@@ -185,11 +163,12 @@ export function AdminVehicleDetails({
 
           <InformationItem
             label="Consumo"
-            value={`${vehicle.fuelConsumptionX100km} L/100 km`}
+            value={`${formatDecimal(
+              vehicle.fuelConsumptionX100km,
+            )} L/100 km`}
           />
         </div>
       </section>
-
 
       <section className="rounded-[20px] border border-[#E5E4DF] bg-white p-5">
         <h3 className="text-[15px] font-bold text-[#111110]">
@@ -223,7 +202,6 @@ export function AdminVehicleDetails({
           />
         </div>
       </section>
-
 
       <section className="rounded-[20px] border border-[#E5E4DF] bg-white p-5">
         <h3 className="text-[15px] font-bold text-[#111110]">
@@ -328,7 +306,6 @@ export function AdminVehicleDetails({
           />
         </div>
 
-
         {vehicle.designatedDrivers.length >
           0 && (
           <div className="mt-6 space-y-4">
@@ -341,7 +318,6 @@ export function AdminVehicleDetails({
                 También debés revisar toda la documentación de los conductores designados.
               </p>
             </div>
-
 
             {vehicle.designatedDrivers.map(
               (
@@ -356,7 +332,6 @@ export function AdminVehicleDetails({
 
                 const licenseId =
                   `designated-${designatedDriver.id}-license`;
-
 
                 return (
                   <div
@@ -381,7 +356,6 @@ export function AdminVehicleDetails({
                         {designatedDriver.dni}
                       </p>
                     </div>
-
 
                     <div className="mt-4 space-y-2">
                       <DocumentLink
@@ -445,13 +419,11 @@ export function AdminVehicleDetails({
           </div>
         )}
 
-
         {!requiredDocumentsAvailable && (
           <p className="mt-4 rounded-[12px] bg-red-50 px-3 py-2 text-[11px] font-medium text-red-700">
             Falta documentación obligatoria. No se puede tomar una decisión sobre este vehículo.
           </p>
         )}
-
 
         {requiredDocumentsAvailable &&
           !documentsReviewed && (
@@ -462,7 +434,6 @@ export function AdminVehicleDetails({
           </p>
         )}
       </section>
-
 
       {vehicle.rejectReason && (
         <section className="rounded-[20px] border border-red-200 bg-red-50 p-5">
@@ -476,7 +447,6 @@ export function AdminVehicleDetails({
         </section>
       )}
 
-
       {vehicle.disableReason && (
         <section className="rounded-[20px] border border-[#E5E4DF] bg-[#F7F6F2] p-5">
           <h3 className="text-[15px] font-bold text-[#111110]">
@@ -488,7 +458,6 @@ export function AdminVehicleDetails({
           </p>
         </section>
       )}
-
 
       {isPending && (
         <div className="space-y-2 pt-2">
@@ -535,7 +504,6 @@ export function AdminVehicleDetails({
         </div>
       )}
 
-
       {isApproved && (
         <div className="pt-2">
           <button
@@ -564,16 +532,12 @@ export function AdminVehicleDetails({
   );
 }
 
-
 function InformationItem({
   label,
   value,
 }: {
-  label:
-    string;
-
-  value:
-    string;
+  label: string;
+  value: string;
 }) {
   return (
     <div>
@@ -588,7 +552,6 @@ function InformationItem({
   );
 }
 
-
 function DocumentLink({
   label,
   actionLabel,
@@ -596,20 +559,11 @@ function DocumentLink({
   reviewed,
   onOpen,
 }: {
-  label:
-    string;
-
-  actionLabel:
-    string;
-
-  url:
-    string | null;
-
-  reviewed:
-    boolean;
-
-  onOpen:
-    () => void;
+  label: string;
+  actionLabel: string;
+  url: string | null;
+  reviewed: boolean;
+  onOpen: () => void;
 }) {
   if (!url) {
     return (
@@ -625,17 +579,12 @@ function DocumentLink({
     );
   }
 
-
   return (
     <a
-      href={
-        url
-      }
+      href={url}
       target="_blank"
       rel="noreferrer"
-      onClick={
-        onOpen
-      }
+      onClick={onOpen}
       className="
         flex
         items-center
