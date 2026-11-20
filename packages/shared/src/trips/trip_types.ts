@@ -20,6 +20,13 @@ export type TodayTrip = {
 export type TripSearchParams = {
   origin: string;
   destination: string;
+
+  originLat: number;
+  originLng: number;
+
+  destinationLat: number;
+  destinationLng: number;
+
   date: string;
 };
 
@@ -43,7 +50,6 @@ export type TripSearchResult = {
   vehicleDescription: string;
   driver: TripSearchDriver | null;
 };
-
 
 /* =========================================================
  * TRIP DETAIL
@@ -115,7 +121,6 @@ export type TripDetail = {
   pricing: TripDetailPricing;
 };
 
-
 /* =========================================================
  * CREATE
  * ======================================================= */
@@ -123,7 +128,6 @@ export type TripDetail = {
 export type CreatedTrip = {
   id: string;
 };
-
 
 /* =========================================================
  * PRICE PREVIEW
@@ -137,25 +141,8 @@ export type TripPricePreview = {
     description: string;
   };
 
-  pricing: {
-    adjustedConsumptionL100Km: number;
-
-    fuelCost: number;
-    tollCost: number;
-    totalWearCost: number;
-    totalTripCost: number;
-
-    sharedFuelAndTollCost: number;
-    passengerWearCost: number;
-
-    suggestedPricePerPassenger: number;
-    minimumPricePerPassenger: number;
-    maximumPricePerPassenger: number;
-
-    driverSharedCost: number;
-  };
+  pricing: TripDetailPricing;
 };
-
 
 /* =========================================================
  * MY PUBLISHED TRIPS

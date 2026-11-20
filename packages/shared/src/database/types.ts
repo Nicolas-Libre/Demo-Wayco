@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -10,32 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.15"
-  }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
+    PostgrestVersion: "14.18"
   }
   public: {
     Tables: {
@@ -51,6 +26,105 @@ export type Database = {
         Update: {
           created_at?: string
           id?: number
+        }
+        Relationships: []
+      }
+      catalog: {
+        Row: {
+          brand: string
+          consumption_l_100km: number | null
+          fuel_type: string | null
+          id: number
+          model: string
+          version: string
+          year: number
+        }
+        Insert: {
+          brand: string
+          consumption_l_100km?: number | null
+          fuel_type?: string | null
+          id?: never
+          model: string
+          version: string
+          year: number
+        }
+        Update: {
+          brand?: string
+          consumption_l_100km?: number | null
+          fuel_type?: string | null
+          id?: never
+          model?: string
+          version?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      catalog_import_candidates: {
+        Row: {
+          anio_modelo: number | null
+          codigo_fuente: string
+          combustible_verificado: string | null
+          consumo_l_100km_verificado: number | null
+          creado_en: string
+          denominacion_original: string
+          estado: string
+          marca_original: string
+          modelo_normalizado: string | null
+          tipo_original: string
+          version_normalizada: string | null
+        }
+        Insert: {
+          anio_modelo?: number | null
+          codigo_fuente: string
+          combustible_verificado?: string | null
+          consumo_l_100km_verificado?: number | null
+          creado_en?: string
+          denominacion_original: string
+          estado?: string
+          marca_original: string
+          modelo_normalizado?: string | null
+          tipo_original: string
+          version_normalizada?: string | null
+        }
+        Update: {
+          anio_modelo?: number | null
+          codigo_fuente?: string
+          combustible_verificado?: string | null
+          consumo_l_100km_verificado?: number | null
+          creado_en?: string
+          denominacion_original?: string
+          estado?: string
+          marca_original?: string
+          modelo_normalizado?: string | null
+          tipo_original?: string
+          version_normalizada?: string | null
+        }
+        Relationships: []
+      }
+      google_maps_usage: {
+        Row: {
+          free_limit: number | null
+          period: string
+          request_count: number
+          request_limit: number
+          service: string
+          updated_at: string
+        }
+        Insert: {
+          free_limit?: number | null
+          period: string
+          request_count?: number
+          request_limit?: number
+          service: string
+          updated_at?: string
+        }
+        Update: {
+          free_limit?: number | null
+          period?: string
+          request_count?: number
+          request_limit?: number
+          service?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -116,6 +190,7 @@ export type Database = {
           category: string
           created_at: string
           id: string
+          is_automatic: boolean
           reviewed_id: string
           reviewer_id: string
           score: number
@@ -125,6 +200,7 @@ export type Database = {
           category: string
           created_at?: string
           id?: string
+          is_automatic?: boolean
           reviewed_id: string
           reviewer_id: string
           score: number
@@ -134,6 +210,7 @@ export type Database = {
           category?: string
           created_at?: string
           id?: string
+          is_automatic?: boolean
           reviewed_id?: string
           reviewer_id?: string
           score?: number
@@ -173,6 +250,7 @@ export type Database = {
           destination_lat: number | null
           destination_lng: number | null
           driver_id: string
+          finalized_at: string | null
           hour: string
           id: string
           notes: string | null
@@ -182,9 +260,9 @@ export type Database = {
           origin_lng: number | null
           price_per_seat: number
           route_distance_meters: number | null
-          route_toll_cost: number | null
           route_duration_seconds: number | null
           route_polyline: string | null
+          route_toll_cost: number | null
           status: string
           total_seats: number
           vehicle_id: string
@@ -198,6 +276,7 @@ export type Database = {
           destination_lat?: number | null
           destination_lng?: number | null
           driver_id: string
+          finalized_at?: string | null
           hour: string
           id?: string
           notes?: string | null
@@ -207,9 +286,9 @@ export type Database = {
           origin_lng?: number | null
           price_per_seat: number
           route_distance_meters?: number | null
-          route_toll_cost?: number | null
           route_duration_seconds?: number | null
           route_polyline?: string | null
+          route_toll_cost?: number | null
           status?: string
           total_seats: number
           vehicle_id: string
@@ -223,6 +302,7 @@ export type Database = {
           destination_lat?: number | null
           destination_lng?: number | null
           driver_id?: string
+          finalized_at?: string | null
           hour?: string
           id?: string
           notes?: string | null
@@ -232,9 +312,9 @@ export type Database = {
           origin_lng?: number | null
           price_per_seat?: number
           route_distance_meters?: number | null
-          route_toll_cost?: number | null
           route_duration_seconds?: number | null
           route_polyline?: string | null
+          route_toll_cost?: number | null
           status?: string
           total_seats?: number
           vehicle_id?: string
@@ -252,6 +332,61 @@ export type Database = {
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_credit_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          rating_id: string | null
+          transaction_type: string
+          trip_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          rating_id?: string | null
+          transaction_type: string
+          trip_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          rating_id?: string | null
+          transaction_type?: string
+          trip_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_credit_transactions_rating_id_fkey"
+            columns: ["rating_id"]
+            isOneToOne: false
+            referencedRelation: "trip_ratings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_credit_transactions_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_credit_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -366,6 +501,7 @@ export type Database = {
       vehicles: {
         Row: {
           brand: string
+          catalog_id: number | null
           created_at: string
           deleted_at: string | null
           disable_reason: string | null
@@ -383,10 +519,12 @@ export type Database = {
           validated_at: string | null
           validated_by: string | null
           validation_state: string
+          version: string | null
           year: number
         }
         Insert: {
           brand: string
+          catalog_id?: number | null
           created_at?: string
           deleted_at?: string | null
           disable_reason?: string | null
@@ -404,10 +542,12 @@ export type Database = {
           validated_at?: string | null
           validated_by?: string | null
           validation_state?: string
+          version?: string | null
           year: number
         }
         Update: {
           brand?: string
+          catalog_id?: number | null
           created_at?: string
           deleted_at?: string | null
           disable_reason?: string | null
@@ -425,9 +565,17 @@ export type Database = {
           validated_at?: string | null
           validated_by?: string | null
           validation_state?: string
+          version?: string | null
           year?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "vehicles_catalog_id_fkey"
+            columns: ["catalog_id"]
+            isOneToOne: false
+            referencedRelation: "catalog"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "vehicles_driver_id_fkey"
             columns: ["driver_id"]
@@ -446,30 +594,21 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      wayco_available_brands: {
+        Row: {
+          brand: string | null
+        }
+        Relationships: []
+      }
+      wayco_available_models: {
+        Row: {
+          brand: string | null
+          model: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      reserve_google_maps_request: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          allowed: boolean
-          current_count: number
-          max_count: number
-          warning_reached: boolean
-        }[]
-      }
-      reserve_google_maps_service_request: {
-        Args: {
-          p_service: string
-          p_free_limit: number
-        }
-        Returns: {
-          allowed: boolean
-          current_count: number
-          max_count: number
-          warning_reached: boolean
-        }[]
-      }
       cancel_my_reservation: {
         Args: { p_reservation_id: string }
         Returns: {
@@ -485,6 +624,7 @@ export type Database = {
           status: string
         }[]
       }
+      complete_expired_trip_ratings: { Args: never; Returns: number }
       create_trip_reservation: {
         Args: { p_seats?: number; p_trip_id: string }
         Returns: {
@@ -501,6 +641,14 @@ export type Database = {
           status: string
         }[]
       }
+      finalize_trip: {
+        Args: { p_trip_id: string }
+        Returns: {
+          id: string
+          status: string
+        }[]
+      }
+      get_user_credit_balance: { Args: never; Returns: number }
       rate_trip_participant: {
         Args: { p_reviewed_id: string; p_score: number; p_trip_id: string }
         Returns: {
@@ -514,6 +662,42 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
+      reserve_google_maps_request: {
+        Args: never
+        Returns: {
+          allowed: boolean
+          current_count: number
+          max_count: number
+          warning_reached: boolean
+        }[]
+      }
+      reserve_google_maps_service_request: {
+        Args: { p_free_limit: number; p_service: string }
+        Returns: {
+          allowed: boolean
+          current_count: number
+          max_count: number
+          warning_reached: boolean
+        }[]
+      }
+      search_trips_geographically: {
+        Args: {
+          p_date: string
+          p_destination_lat: number
+          p_destination_lng: number
+          p_limit?: number
+          p_minimum_hour?: string
+          p_origin_lat: number
+          p_origin_lng: number
+          p_radius_km?: number
+        }
+        Returns: {
+          destination_distance_km: number
+          origin_distance_km: number
+          total_distance_km: number
+          trip_id: string
+        }[]
+      }
       update_trip_reservation_status: {
         Args: { p_reservation_id: string; p_status: string }
         Returns: {
@@ -521,6 +705,19 @@ export type Database = {
           seats: number
           status: string
         }[]
+      }
+      wayco_distance_km: {
+        Args: { lat1: number; lat2: number; lng1: number; lng2: number }
+        Returns: number
+      }
+      wayco_register_catalog_vehicle: {
+        Args: {
+          p_brand: string
+          p_model: string
+          p_version: string
+          p_year: number
+        }
+        Returns: number
       }
     }
     Enums: {
@@ -650,9 +847,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },

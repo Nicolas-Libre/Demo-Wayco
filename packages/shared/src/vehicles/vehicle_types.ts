@@ -1,3 +1,4 @@
+
 import type {
   VEHICLE_FUEL_TYPES,
   VEHICLE_VALIDATION_STATUSES,
@@ -13,10 +14,34 @@ export type VehicleValidationStatus =
 
 
 /* =========================================================
- * DESIGNATED DRIVER
+ * VEHICLE CATALOG
  * ======================================================= */
 
+export type CatalogFuelType =
+  | "gasoline"
+  | "diesel";
 
+
+export type CatalogVehicle = {
+  id: number;
+
+  brand: string;
+
+  model: string;
+
+  year: number;
+
+  version: string;
+
+  fuelType: CatalogFuelType;
+
+  consumptionL100Km: number;
+};
+
+
+/* =========================================================
+ * DESIGNATED DRIVER
+ * ======================================================= */
 
 export type VehicleDesignatedDriver = {
   id:
@@ -65,6 +90,9 @@ export type CreatedVehicle = {
   year:
     number;
 
+  version:
+    string | null;
+
   fuelType:
     VehicleFuelType;
 
@@ -89,6 +117,9 @@ export type MyVehicle = {
 
   year:
     number;
+
+  version:
+    string | null;
 
   licensePlate:
     string;
@@ -148,6 +179,9 @@ export type AdminVehicleSummary = {
 
   year:
     number;
+
+  version:
+    string | null;
 
   licensePlate:
     string;
